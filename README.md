@@ -56,3 +56,5 @@ override.update(from: "https://tylr.us/testing/override.json") {success in
 ```
 
 Note: For maximum flexibility, you can include your JSON URL as a value in your initialValues/JSON file, passing the UserDefaults value for your assigned key in the `update` method.
+
+Once it's implemented, the app will check on each launch (or whenever the `update` method is fired), so if you decide to change endpoint versions, offer that free trial, or even change your JSON URL, just update the file on your server and your users will see the updates.
