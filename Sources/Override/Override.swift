@@ -7,6 +7,10 @@ public class Override {
         case jsonResponseIsNotDictionary
     }
     
+    public init() {
+        
+    }
+    
     public typealias BooleanCompletionHandler = (Bool) -> Void
     
     public var userDefaultsInstance = UserDefaults.standard
