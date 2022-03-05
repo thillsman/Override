@@ -26,7 +26,7 @@ public class Override {
             throw OverrideError.invalidUrl
         }
         let request = buildRequest(url: url)
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, _) = try await URLSession.shared.dataWithBackport(for: request)
         let json = try JSONSerialization.jsonObject(with: data, options: [])
         guard let dictionary = json as? [String: Any] else {
             throw OverrideError.jsonResponseIsNotDictionary
@@ -48,5 +48,24 @@ public class Override {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         return request
+    }
+}
+
+extension URLSession {
+    func dataWithBackport(for request: URLRequest) async throws -> (Data, URLResponse) {
+        if #available(iOS 15, *) {
+            return try await data(for: request)
+        } else {
+            return try await withCheckedThrowingContinuation { continuation in
+                let task = self.dataTask(with: request) { data, response, error in
+                    guard let data = data, let response = response else {
+                        let error = error ?? URLError(.badServerResponse)
+                        return continuation.resume(throwing: error)
+                    }
+                    continuation.resume(returning: (data, response))
+                }
+                task.resume()
+            }
+        }
     }
 }
